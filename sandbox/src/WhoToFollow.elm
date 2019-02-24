@@ -25,6 +25,19 @@ type alias Model =
     List ( Int, Row )
 
 
+updateRow index mapper model =
+    let
+        f ( i, row ) =
+            ( i
+            , if (i == index) then
+                mapper row
+              else
+                row
+            )
+    in
+        model |> List.map f
+
+
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
@@ -70,21 +83,22 @@ update msg model =
                             (D.field "login" D.string)
 
                 getUsers =
-                    Http.get { url = "https://api.github.com/users?since=" ++ (String.fromInt offset), expect = Http.expectJson (GotUsers index) decoder }
+                    Http.get
+                        { url = "https://api.github.com/users?since=" ++ (String.fromInt offset)
+                        , expect = Http.expectJson (GotUsers index) decoder
+                        }
             in
                 ( model, getUsers )
 
         GotUsers index (Ok users) ->
             let
-                f ( i, r ) =
-                    ( i
-                    , if (i == index) then
-                        { r | users = users }
-                      else
-                        r
-                    )
+                setUsers r =
+                    { r | users = users }
+
+                nextUser =
+                    Task.succeed ( index, users ) |> Task.perform NextUser
             in
-                ( model |> List.map f, Task.succeed ( index, users ) |> Task.perform NextUser )
+                ( updateRow index setUsers model, nextUser )
 
         GotUsers _ (Err _) ->
             ( model, Cmd.none )
@@ -109,15 +123,10 @@ update msg model =
 
         DecidedUser index user ->
             let
-                f ( i, r ) =
-                    ( i
-                    , if (i == index) then
-                        { r | user = user }
-                      else
-                        r
-                    )
+                setUser r =
+                    { r | user = user }
             in
-                ( model |> List.map f, Cmd.none )
+                ( updateRow index setUser model, Cmd.none )
 
 
 
