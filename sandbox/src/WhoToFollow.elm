@@ -42,21 +42,30 @@ update msg model =
 view : Model -> Html Msg
 view { users } =
     let
+        css =
+            { container = [ style "font-family" "sans-serif", style "padding" "10px" ]
+            , header = [ style "background" "#ececec", style "padding" "5px" ]
+            , title = [ style "font-weight" "bold", style "display" "inline-block" ]
+            , refresh = [ style "font-size" "80%", style "margin-left" "10px" ]
+            , suggestions = [ style "border" "2px solid #ececec", style "list-style" "none" ]
+            , avatar = [ style "width" "40px", style "height" "40px", style "border-radius" "20px" ]
+            , username = [ style "display" "inline-block", style "position" "relative", style "bottom" "15px", style "left" "5px" ]
+            , close = [ style "margin-left" "10px" ]
+            }
+
         userHtml user =
-            li []
-                [ img [ src user.avatarUrl ] []
-                , a [ class "username", href user.htmlUrl, target "_blank" ] [ text user.login ]
-                , text " "
-                , a [ class "close", href "#" ] [ text "x" ]
+            li [ style "padding" "5px" ]
+                [ img (css.avatar ++ [ src user.avatarUrl ]) []
+                , a (css.username ++ [ href user.htmlUrl, target "_blank" ]) [ text user.login ]
+                , a (css.username ++ css.close ++ [ href "#" ]) [ text "x" ]
                 ]
     in
-        div [ class "container" ]
-            [ div [ class "header" ]
-                [ h2 [] [ text "Who to follow" ]
-                , text " "
-                , a [ href "#" ] [ text "Refresh" ]
+        div css.container
+            [ div css.header
+                [ h2 css.title [ text "Who to follow" ]
+                , a (css.refresh ++ [ href "#" ]) [ text "Refresh" ]
                 ]
-            , ul [ class "suggestions" ] (users |> List.map userHtml)
+            , ul css.suggestions (users |> List.map userHtml)
             ]
 
 
