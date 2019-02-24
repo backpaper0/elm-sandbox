@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import Random
 import Http
 import Json.Decode as D
+import Task
 
 
 ---- MODEL ----
@@ -26,7 +27,11 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( List.repeat 3 (Row (Just (User "" "" "foo")) [ User "" "" "foo", User "" "" "bar", User "" "" "baz" ]) |> List.indexedMap Tuple.pair, Cmd.none )
+    let
+        f () =
+            Refresh
+    in
+        ( List.repeat 3 (Row Nothing []) |> List.indexedMap Tuple.pair, Task.succeed () |> Task.perform f )
 
 
 
@@ -34,14 +39,57 @@ init _ =
 
 
 type Msg
-    = NextUser ( Int, Row )
+    = Refresh
+    | DecidedOffset Int Int
+    | GotUsers Int (Result Http.Error (List User))
+    | NextUser ( Int, List User )
     | DecidedUser Int (Maybe User)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NextUser ( index, row ) ->
+        Refresh ->
+            let
+                nextOffset index =
+                    Random.generate (DecidedOffset index) (Random.int 0 499)
+
+                nextOffsets =
+                    model |> List.map Tuple.first |> List.map nextOffset |> Cmd.batch
+            in
+                ( model, nextOffsets )
+
+        DecidedOffset index offset ->
+            let
+                decoder =
+                    D.list <|
+                        D.map3
+                            User
+                            (D.field "avatar_url" D.string)
+                            (D.field "html_url" D.string)
+                            (D.field "login" D.string)
+
+                getUsers =
+                    Http.get { url = "https://api.github.com/users?since=" ++ (String.fromInt offset), expect = Http.expectJson (GotUsers index) decoder }
+            in
+                ( model, getUsers )
+
+        GotUsers index (Ok users) ->
+            let
+                f ( i, r ) =
+                    ( i
+                    , if (i == index) then
+                        { r | users = users }
+                      else
+                        r
+                    )
+            in
+                ( model |> List.map f, Task.succeed ( index, users ) |> Task.perform NextUser )
+
+        GotUsers _ (Err _) ->
+            ( model, Cmd.none )
+
+        NextUser ( index, users ) ->
             let
                 f cond a ( i, b ) =
                     ( i + 1
@@ -52,10 +100,10 @@ update msg model =
                     )
 
                 getUser a =
-                    row.users |> List.foldl (f a) ( 1, Nothing ) |> Tuple.second
+                    users |> List.foldl (f a) ( 1, Nothing ) |> Tuple.second
 
                 generator =
-                    Random.int 1 (List.length row.users) |> Random.map getUser
+                    Random.int 1 (List.length users) |> Random.map getUser
             in
                 ( model, Random.generate (DecidedUser index) generator )
 
@@ -97,7 +145,7 @@ view model =
                     li css.suggestion
                         [ img (css.avatar ++ [ src user.avatarUrl ]) []
                         , a (css.username ++ [ href user.htmlUrl, target "_blank" ]) [ text user.login ]
-                        , a (css.username ++ css.close ++ [ href "#", onClick (NextUser ( index, row )) ]) [ text "x" ]
+                        , a (css.username ++ css.close ++ [ href "#", onClick (NextUser ( index, row.users )) ]) [ text "x" ]
                         ]
 
                 Nothing ->
@@ -110,7 +158,7 @@ view model =
         div css.container
             [ div css.header
                 [ h2 css.title [ text "Who to follow" ]
-                , a (css.refresh ++ [ href "#" ]) [ text "Refresh" ]
+                , a (css.refresh ++ [ href "#", onClick Refresh ]) [ text "Refresh" ]
                 ]
             , ul css.suggestions (model |> List.map userHtml)
             ]
