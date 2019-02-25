@@ -60,6 +60,7 @@ menu =
         [ li [] [ a [ href "#foo" ] [ text "foo" ] ]
         , li [] [ a [ href "#bar" ] [ text "bar" ] ]
         , li [] [ a [ href "#baz" ] [ text "baz" ] ]
+        , li [] [ a [ href "https://github.com" ] [ text "GitHub" ] ]
         ]
 
 
