@@ -46,8 +46,9 @@ map f m =
         Matrix (m.cells |> Array.indexedMap (\i a -> f (g i) a)) m.size
 
 
-next x a =
-    if a then
-        (x == 2 || x == 3)
+next : Int -> Bool -> Bool
+next a b =
+    if b then
+        (a == 2 || a == 3)
     else
-        (x > 2)
+        (a > 2)
