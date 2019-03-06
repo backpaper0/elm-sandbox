@@ -1,28 +1,49 @@
 module LifeGame exposing (..)
 
-import Array
+import Array exposing (Array)
 
 
-get r c cs =
-    Array.get r cs |> Maybe.andThen (Array.get c)
+type alias Matrix a =
+    { cells : Array a, width : Int, height : Int }
 
 
-map f cs =
+get : Int -> Int -> Matrix a -> Maybe a
+get x y m =
     let
-        g i j =
-            [ get (i - 1) (j - 1) cs
-            , get (i - 1) j cs
-            , get (i - 1) (j + 1) cs
-            , get i (j - 1) cs
-            , get i (j + 1) cs
-            , get (i + 1) (j - 1) cs
-            , get (i + 1) j cs
-            , get (i + 1) (j + 1) cs
-            ]
-                |> List.filterMap identity
-                |> Array.fromList
+        i =
+            y * m.width + x
     in
-        cs |> Array.indexedMap (\i -> Array.indexedMap (\j -> g i j |> f))
+        if x < 0 then
+            Nothing
+        else if y < 0 then
+            Nothing
+        else if x > (m.width - 1) then
+            Nothing
+        else
+            Array.get i m.cells
+
+
+map : (Array a -> a -> b) -> Matrix a -> Matrix b
+map f m =
+    let
+        g i =
+            let
+                ( x, y ) =
+                    ( modBy m.width i, i // m.width )
+            in
+                [ get (x - 1) (y - 1) m
+                , get (x - 1) y m
+                , get (x - 1) (y + 1) m
+                , get x (y - 1) m
+                , get x (y + 1) m
+                , get (x + 1) (y - 1) m
+                , get (x + 1) y m
+                , get (x + 1) (y + 1) m
+                ]
+                    |> List.filterMap identity
+                    |> Array.fromList
+    in
+        Matrix (m.cells |> Array.indexedMap (\i a -> f (g i) a)) m.width m.height
 
 
 next x a =
