@@ -7,7 +7,7 @@ import LifeGame exposing (..)
 
 
 matrix1 =
-    Matrix (Array.fromList [ 1, 2, 3, 4 ]) 2 2
+    Matrix (Array.fromList [ 1, 2, 3, 4 ]) 2
 
 
 matrix2 =
@@ -20,7 +20,6 @@ matrix2 =
             |> Array.fromList
         )
         3
-        3
 
 
 matrix3 =
@@ -32,7 +31,6 @@ matrix3 =
             |> List.concat
             |> Array.fromList
         )
-        3
         3
 
 

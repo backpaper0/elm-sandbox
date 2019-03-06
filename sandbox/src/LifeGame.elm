@@ -4,20 +4,20 @@ import Array exposing (Array)
 
 
 type alias Matrix a =
-    { cells : Array a, width : Int, height : Int }
+    { cells : Array a, size : Int }
 
 
 get : Int -> Int -> Matrix a -> Maybe a
 get x y m =
     let
         i =
-            y * m.width + x
+            y * m.size + x
     in
         if x < 0 then
             Nothing
         else if y < 0 then
             Nothing
-        else if x > (m.width - 1) then
+        else if x > (m.size - 1) then
             Nothing
         else
             Array.get i m.cells
@@ -29,7 +29,7 @@ map f m =
         g i =
             let
                 ( x, y ) =
-                    ( modBy m.width i, i // m.width )
+                    ( modBy m.size i, i // m.size )
             in
                 [ get (x - 1) (y - 1) m
                 , get (x - 1) y m
@@ -43,7 +43,7 @@ map f m =
                     |> List.filterMap identity
                     |> Array.fromList
     in
-        Matrix (m.cells |> Array.indexedMap (\i a -> f (g i) a)) m.width m.height
+        Matrix (m.cells |> Array.indexedMap (\i a -> f (g i) a)) m.size
 
 
 next x a =
