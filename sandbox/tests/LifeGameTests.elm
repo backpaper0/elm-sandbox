@@ -67,8 +67,6 @@ suite =
             , test "out of column range" <|
                 (\_ -> Expect.equal Nothing (get 2 0 matrix1))
             ]
-        , describe "map"
-            [ test "map matrix" <|
-                (\_ -> Expect.equal matrix3 <| map (\a b -> (Array.foldl (+) 0 a) + b) matrix2)
-            ]
+        , test "map matrix" <|
+            (\_ -> Expect.equal matrix3 <| map (\a b -> (Array.foldl (+) 0 a) + b) matrix2)
         ]
