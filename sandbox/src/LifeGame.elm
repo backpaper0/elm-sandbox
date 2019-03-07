@@ -55,7 +55,7 @@ next a b =
     if b then
         (a == 2 || a == 3)
     else
-        (a > 2)
+        (a == 3)
 
 
 main =
