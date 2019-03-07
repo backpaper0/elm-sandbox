@@ -6,6 +6,7 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time exposing (Posix)
 import Html exposing (Html)
+import Random exposing (Generator)
 
 
 type alias Matrix a =
@@ -65,6 +66,7 @@ type alias Model =
 
 type Msg
     = Tick Posix
+    | Init (Array Bool)
 
 
 main =
@@ -78,11 +80,17 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( Matrix
-        (Array.fromList [ True, True, False, True, False, False, False, False, False, False, False, False, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, True, False, True, False, False, True, True, True, True, False, False, False, False, True, False, True, False, True, True, True, True, True, True, False, True, True, False, True, True, False, False, False, True, True, False, True, True, False, True, True, True, False, True, True, True, False, False, True, False, True, True, False, True, True, False, False, False, False, False, False, False, True, False, True, True, False, True, True, True, True, False, True, True, True, True, False, False, False, True, True, False, False, False, True, True, False, True, True, True, True, True, True, False, True, False, True, True, True, True, False, True, False, False, True, False, False, True, True, False, False, False, False, False, False, False, True, False, True, False, True, False, True, False, False, False, True, False, False, True, False, False, True, True, False, True, False, True, False, True, True, True, True, False, False, False, True, True, True, True, False, True, False, True, True, True, False, True, True, False, False, False, True, True, False, False, False, False, True, False, True, True, False, True, False, True, False, True, False, False, False, False, False, True, False, True, True, True, True, False, False, False, True, False, True, False, True, True, True, True, True, True, True, False, False, True, False, False, True, True, True, True, False, False, True, True, True, True, False, True, False, False, False, False, False, False, True, False, True, False, True, True, False, True, True, True, True, False, False, True, True, True, False, False, False, False, True, True, True, False, False, False, True, False, False, True, False, False, False, True, False, True, True, True, True, False, True, False, False, True, True, True, False, True, False, True, True, False, False, False, True, False, True, True, False, True, False, False, True, False, False, True, False, True, True, False, False, True, False, False, False, False, True, True, False, True, True, False, True, False, True, True, True, True, True, False, False, True, False, False, True, False, True, True, True, False, False, True, True, True, False, False, True, False, False, False, False, False, True, False, False, False, True, True, False, True, True, False, False, True, True, True, True, True, True, False, True, False, True, True, False, False, True, True, True, True, True, True, False, True, True, True, True, True, False, False, False, True, True, True, False, True, False, True, False, True, True, True, False, False, False, True, False, True, False, True, False, False, True, False, True, True, False, True, False, True, False, True, True, True, True, False, False, True, False, False, True, True, False, False, True, True, False, True, False, False, True, False, False, False, True, True, False, True, False, True, False, False, False, False, False, True, True, True, True, True, True, False, True, False, False, True, True, True, False, True, False, False, True, True, True, True, False, True, False, True, True, True, False, False, True, False, True, True, False, True, True, True, True, False, False, True, False, False, True, True, True, False, False, True, True, True, True, True, True, True, False, False, False, False, True, True, False, False, True, False, True, False, True, False, True, False, False, False, False, False, True, True, True, False, True, False, True, True, False, True, True, False, True, True, False, False, False, True, False, True, True, True, False, True, True, False, False, True, False, True, False, True, False, True, False, True, False, True, True, False, True, False, True, False, True, True, False, True, True, False, True, False, True, False, True, False, True, True, True, True, False, True, False, False, False, False, True, True, False, True, True, True, False, False, True, False, False, False, False, False, True, True, True, False, False, False, True, False, True, True, True, True, False, True, True, True, True, False, True, True, False, True, False, True, False, False, True, False, True, False, True, False, False, True, False, True, False, False, True, True, False, False, True, False, False, True, False, False, False, True, True, True, True, False, False, False, False, False, False, False, False, True, True, False, False, True, False, True, False, False, False, True, False, True, True, True, True, False, False, False, False, True, False, False, False, True, True, False, False, False, True, True, False, False, True, False, False, False, True, True, True, False, True, True, False, True, True, False, True, True, True, False, True, True, False, True, False, False, False, False, True, False, False, False, False, True, True, True, False, False, True, False, True, True, True, True, False, True, False, True, True, False, True, True, True, False, True, False, True, True, True, False, True, False, True, False, True, False, False, True, False, True, False, True, True, True, False, False, False, False, False, True, False, True, True, True, False, False, True, False, True, True, True, True, True, False, True, False, False, False, True, False, False, True, True, False, False, False, True, True, True, True, False, False, False, True, False, False, True, True, False, True, False, True, False, False, False, False, True, True, False, False, True, True, True, False, False, True, False, True, False, False, True, False, False, False, False, False, True, False, False, False, False, True, True, True, False, False, True, True, True, True, True, True, True, True, True, False, True, True, False, False, True, False, True, True, True, True, False, True, False, False, True, True, False, True, False, False, False, True, True, False, False, True, False, True, False, True, True, True, False, True, False, True, True, True, True, False, False, True, True, False, False, True, True, False, True, True, False, True, False, False, False, True, True, True, True, False, False, False, True, False, True, False, True, False, False, True, True, False, False, True, False, False, True, False, True, False, True, True, True, True, True, False, False, False, False, False, False, True, True, False, False, True, True, False, True, True, True, False, False, True, False, False, True, True, False, True, True, True, True, True, False, True, True, False, True, False, False, True, True, False, False, True, False, False, False, True, False, True, False, False, False, False, True, False, False, True, True, False, False, True ])
-        32
-    , Cmd.none
-    )
+    let
+        gen1 =
+            Random.int 0 1 |> Random.map ((==) 0)
+
+        gen2 =
+            Random.list (32 * 32) gen1
+
+        gen3 =
+            Random.map Array.fromList gen2
+    in
+        ( Matrix Array.empty 32, Random.generate Init gen3 )
 
 
 view : Model -> Html Msg
@@ -123,8 +131,14 @@ update msg model =
             next (a |> Array.filter identity |> Array.length) b
     in
         case msg of
+            Init cells ->
+                ( { model | cells = cells }, Cmd.none )
+
             Tick _ ->
-                ( map f model, Cmd.none )
+                if (Array.isEmpty model.cells) then
+                    ( model, Cmd.none )
+                else
+                    ( map f model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
