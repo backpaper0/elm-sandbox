@@ -1,6 +1,10 @@
 module LifeGame exposing (..)
 
 import Array exposing (Array)
+import Browser
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
+import Time
 
 
 type alias Matrix a =
@@ -52,3 +56,17 @@ next a b =
         (a == 2 || a == 3)
     else
         (a > 2)
+
+
+main =
+    let
+        size1 =
+            32
+
+        size2 =
+            20
+
+        size3 =
+            size * size2
+    in
+    svg [ width (String.fromInt size3), height (String.fromInt size3), viewBox ("0 0 " ++ String.fromInt size3 ++ " " ++ String.fromInt size3) ] (List.range 0 size1 |> List.map (\a -> List.range 0 size1 |> List.map (\b -> rect [ x (String.fromInt (a * size2)), y (String.fromInt (b * size2)), width (String.fromInt size2), height (String.fromInt size2), rx "10", ry "10" ] [])) |> List.concat)
