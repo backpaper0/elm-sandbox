@@ -2,10 +2,10 @@ module LifeGame exposing (..)
 
 import Array exposing (Array)
 import Browser
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
+import Svg
+import Svg.Attributes as SvgAttrs
 import Time exposing (Posix)
-import Html exposing (Html)
+import Html exposing (..)
 import Random exposing (Generator)
 
 
@@ -102,8 +102,8 @@ view model =
         unit =
             20
 
-        size3 =
-            model.size * unit
+        sizeText =
+            model.size * unit |> String.fromInt
 
         fillColor a b =
             get a b model
@@ -115,32 +115,32 @@ view model =
                             "rgb(255, 255, 255)"
                     )
                 |> Maybe.withDefault "rgb(255, 255, 255)"
-                |> fill
+                |> SvgAttrs.fill
 
         makeCell i =
             let
-                a =
+                x =
                     modBy model.size i
 
-                b =
+                y =
                     i // model.size
             in
-                rect
-                    [ x (String.fromInt (a * unit))
-                    , y (String.fromInt (b * unit))
-                    , width (String.fromInt unit)
-                    , height (String.fromInt unit)
-                    , rx "10"
-                    , ry "10"
-                    , fillColor a b
+                Svg.rect
+                    [ SvgAttrs.x (String.fromInt (x * unit))
+                    , SvgAttrs.y (String.fromInt (y * unit))
+                    , SvgAttrs.width (String.fromInt unit)
+                    , SvgAttrs.height (String.fromInt unit)
+                    , SvgAttrs.rx "10"
+                    , SvgAttrs.ry "10"
+                    , fillColor x y
                     ]
                     []
     in
         Html.div []
-            [ svg
-                [ width (String.fromInt size3)
-                , height (String.fromInt size3)
-                , viewBox ("0 0 " ++ String.fromInt size3 ++ " " ++ String.fromInt size3)
+            [ Svg.svg
+                [ SvgAttrs.width sizeText
+                , SvgAttrs.height sizeText
+                , SvgAttrs.viewBox ("0 0 " ++ sizeText ++ " " ++ sizeText)
                 ]
                 (List.range 0 (model.size * model.size) |> List.map makeCell)
             ]
