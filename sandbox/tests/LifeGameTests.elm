@@ -38,17 +38,27 @@ suite : Test
 suite =
     describe "LifeGame"
         [ describe "next"
-            [ test "birth" <|
-                (\_ -> Expect.true "" <| next 3 False)
-            , test "survival 2" <|
-                (\_ -> Expect.true "" <| next 2 True)
-            , test "survival 3" <|
-                (\_ -> Expect.true "" <| next 3 True)
-            , test "depopulation" <|
-                (\_ -> Expect.false "" <| next 1 True)
-            , test "crowded" <|
-                (\_ -> Expect.false "" <| next 4 True)
-            ]
+            ([ ( False, 0, Expect.false )
+             , ( False, 1, Expect.false )
+             , ( False, 2, Expect.false )
+             , ( False, 3, Expect.true )
+             , ( False, 4, Expect.false )
+             , ( False, 5, Expect.false )
+             , ( False, 6, Expect.false )
+             , ( False, 7, Expect.false )
+             , ( False, 8, Expect.false )
+             , ( True, 0, Expect.false )
+             , ( True, 1, Expect.false )
+             , ( True, 2, Expect.true )
+             , ( True, 3, Expect.true )
+             , ( True, 4, Expect.false )
+             , ( True, 5, Expect.false )
+             , ( True, 6, Expect.false )
+             , ( True, 7, Expect.false )
+             , ( True, 8, Expect.false )
+             ]
+                |> List.indexedMap (\i ( a, b, c ) -> test ("next " ++ (String.fromInt i)) (\_ -> c "" <| next b a))
+            )
         , describe "get"
             [ test "get 1" <|
                 (\_ -> Expect.equal (Just 1) (get 0 0 matrix1))
