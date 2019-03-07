@@ -34,8 +34,11 @@ map f m =
     let
         g i =
             let
-                ( x, y ) =
-                    ( modBy m.size i, i // m.size )
+                x =
+                    modBy m.size i
+
+                y =
+                    i // m.size
             in
                 [ get (x - 1) (y - 1) m
                 , get (x - 1) y m
@@ -113,6 +116,25 @@ view model =
                     )
                 |> Maybe.withDefault "rgb(255, 255, 255)"
                 |> fill
+
+        makeCell i =
+            let
+                a =
+                    modBy model.size i
+
+                b =
+                    i // model.size
+            in
+                rect
+                    [ x (String.fromInt (a * unit))
+                    , y (String.fromInt (b * unit))
+                    , width (String.fromInt unit)
+                    , height (String.fromInt unit)
+                    , rx "10"
+                    , ry "10"
+                    , fillColor a b
+                    ]
+                    []
     in
         Html.div []
             [ svg
@@ -120,7 +142,7 @@ view model =
                 , height (String.fromInt size3)
                 , viewBox ("0 0 " ++ String.fromInt size3 ++ " " ++ String.fromInt size3)
                 ]
-                (List.range 0 model.size |> List.map (\a -> List.range 0 model.size |> List.map (\b -> rect [ x (String.fromInt (a * unit)), y (String.fromInt (b * unit)), width (String.fromInt unit), height (String.fromInt unit), rx "10", ry "10", fillColor a b ] [])) |> List.concat)
+                (List.range 0 (model.size * model.size) |> List.map makeCell)
             ]
 
 
