@@ -64,7 +64,7 @@ next a b =
 
 
 type alias Model =
-    Matrix Bool
+    { matrix : Matrix Bool }
 
 
 type Msg
@@ -93,20 +93,20 @@ init () =
         gen3 =
             Random.map Array.fromList gen2
     in
-        ( Matrix Array.empty 32, Random.generate Init gen3 )
+        ( { matrix = Matrix Array.empty 32 }, Random.generate Init gen3 )
 
 
 view : Model -> Html Msg
-view model =
+view { matrix } =
     let
         unit =
             20
 
         sizeText =
-            model.size * unit |> String.fromInt
+            matrix.size * unit |> String.fromInt
 
         fillColor a b =
-            get a b model
+            get a b matrix
                 |> Maybe.map
                     (\c ->
                         if c then
@@ -120,10 +120,10 @@ view model =
         makeCell i =
             let
                 x =
-                    modBy model.size i
+                    modBy matrix.size i
 
                 y =
-                    i // model.size
+                    i // matrix.size
             in
                 Svg.rect
                     [ SvgAttrs.x (String.fromInt (x * unit))
@@ -142,7 +142,7 @@ view model =
                 , SvgAttrs.height sizeText
                 , SvgAttrs.viewBox ("0 0 " ++ sizeText ++ " " ++ sizeText)
                 ]
-                (List.range 0 (model.size * model.size) |> List.map makeCell)
+                (List.range 0 (matrix.size * matrix.size) |> List.map makeCell)
             ]
 
 
@@ -154,13 +154,20 @@ update msg model =
     in
         case msg of
             Init cells ->
-                ( { model | cells = cells }, Cmd.none )
+                let
+                    m1 =
+                        model.matrix
+
+                    m2 =
+                        { m1 | cells = cells }
+                in
+                    ( { model | matrix = m2 }, Cmd.none )
 
             Tick _ ->
-                if (Array.isEmpty model.cells) then
+                if (Array.isEmpty model.matrix.cells) then
                     ( model, Cmd.none )
                 else
-                    ( map f model, Cmd.none )
+                    ( { model | matrix = map f model.matrix }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
