@@ -1,4 +1,4 @@
-module Main exposing (..)
+module JsonExample exposing (..)
 
 import Browser
 import Html exposing (..)

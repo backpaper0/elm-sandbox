@@ -1,4 +1,4 @@
-module Main exposing (..)
+module TickExample exposing (..)
 
 import Browser
 import Html exposing (..)

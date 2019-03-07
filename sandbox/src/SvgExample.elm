@@ -1,4 +1,4 @@
-module Main exposing (..)
+module SvgExample exposing (..)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
