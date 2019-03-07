@@ -121,17 +121,19 @@ view { matrix, unit } =
         sizeText =
             matrix.size * unit |> String.fromInt
 
-        fillColor a b =
-            get a b matrix
-                |> Maybe.map
-                    (\c ->
-                        if c then
-                            "rgb(100, 100, 100)"
-                        else
-                            "rgb(255, 255, 255)"
-                    )
-                |> Maybe.withDefault "rgb(255, 255, 255)"
-                |> SvgAttrs.fill
+        fillColor x y =
+            let
+                bool2maybe b =
+                    if b then
+                        Just b
+                    else
+                        Nothing
+            in
+                get x y matrix
+                    |> Maybe.andThen bool2maybe
+                    |> Maybe.map (\c -> "#4dbfd2")
+                    |> Maybe.withDefault "rgb(255, 255, 255)"
+                    |> SvgAttrs.fill
 
         makeCell i =
             let
