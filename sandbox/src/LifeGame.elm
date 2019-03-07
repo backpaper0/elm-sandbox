@@ -125,13 +125,12 @@ view { matrix, unit } =
             let
                 bool2maybe b =
                     if b then
-                        Just b
+                        Just "#4dbfd2"
                     else
                         Nothing
             in
                 get x y matrix
                     |> Maybe.andThen bool2maybe
-                    |> Maybe.map (\c -> "#4dbfd2")
                     |> Maybe.withDefault "rgb(255, 255, 255)"
                     |> SvgAttrs.fill
 
