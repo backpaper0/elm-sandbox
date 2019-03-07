@@ -13,11 +13,28 @@ type alias Matrix a =
     { cells : Array a, size : Int }
 
 
+index2pos : Int -> Int -> ( Int, Int )
+index2pos size i =
+    let
+        x =
+            modBy size i
+
+        y =
+            i // size
+    in
+        ( x, y )
+
+
+pos2index : Int -> ( Int, Int ) -> Int
+pos2index size ( x, y ) =
+    y * size + x
+
+
 get : Int -> Int -> Matrix a -> Maybe a
 get x y m =
     let
         i =
-            y * m.size + x
+            pos2index m.size ( x, y )
     in
         if x < 0 then
             Nothing
@@ -34,11 +51,8 @@ map f m =
     let
         g i =
             let
-                x =
-                    modBy m.size i
-
-                y =
-                    i // m.size
+                ( x, y ) =
+                    index2pos m.size i
             in
                 [ get (x - 1) (y - 1) m
                 , get (x - 1) y m
@@ -64,7 +78,9 @@ next a b =
 
 
 type alias Model =
-    { matrix : Matrix Bool }
+    { matrix : Matrix Bool
+    , unit : Int
+    }
 
 
 type Msg
@@ -84,24 +100,24 @@ main =
 init : () -> ( Model, Cmd Msg )
 init () =
     let
+        size =
+            32
+
         gen1 =
             Random.int 0 1 |> Random.map ((==) 0)
 
         gen2 =
-            Random.list (32 * 32) gen1
+            Random.list (size * size) gen1
 
         gen3 =
             Random.map Array.fromList gen2
     in
-        ( { matrix = Matrix Array.empty 32 }, Random.generate Init gen3 )
+        ( { matrix = Matrix Array.empty size, unit = 20 }, Random.generate Init gen3 )
 
 
 view : Model -> Html Msg
-view { matrix } =
+view { matrix, unit } =
     let
-        unit =
-            20
-
         sizeText =
             matrix.size * unit |> String.fromInt
 
@@ -119,19 +135,16 @@ view { matrix } =
 
         makeCell i =
             let
-                x =
-                    modBy matrix.size i
-
-                y =
-                    i // matrix.size
+                ( x, y ) =
+                    index2pos matrix.size i
             in
                 Svg.rect
                     [ SvgAttrs.x (String.fromInt (x * unit))
                     , SvgAttrs.y (String.fromInt (y * unit))
                     , SvgAttrs.width (String.fromInt unit)
                     , SvgAttrs.height (String.fromInt unit)
-                    , SvgAttrs.rx "10"
-                    , SvgAttrs.ry "10"
+                    , SvgAttrs.rx "8"
+                    , SvgAttrs.ry "8"
                     , fillColor x y
                     ]
                     []
