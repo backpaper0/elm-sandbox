@@ -17,27 +17,40 @@ main =
 
 
 type alias Model =
-    { posix : String }
+    { posix : String, tick : Float }
 
 
+init : () -> ( Model, Cmd Msg )
 init () =
-    ( { posix = "0" }, Cmd.none )
+    ( { posix = "0", tick = 100 }, Cmd.none )
 
 
 type Msg
     = Tick Time.Posix
+    | Input (Maybe Float)
 
 
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Tick posix ->
             ( { model | posix = Time.posixToMillis posix |> String.fromInt }, Cmd.none )
 
+        Input (Just tick) ->
+            ( { model | tick = tick }, Cmd.none )
 
-view model =
-    div [ style "margin" "2rem" ]
-        [ text model.posix ]
+        Input Nothing ->
+            ( model, Cmd.none )
 
 
-subscriptions model =
-    Time.every 100 Tick
+view : Model -> Html Msg
+view { posix, tick } =
+    div []
+        [ p [] [ text posix ]
+        , p [] [ input [ value <| String.fromFloat tick, onInput <| String.toFloat >> Input ] [] ]
+        ]
+
+
+subscriptions : Model -> Sub Msg
+subscriptions { tick } =
+    Time.every tick Tick
