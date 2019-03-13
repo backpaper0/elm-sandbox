@@ -32,6 +32,7 @@ type Msg
 type Page
     = CounterPage
     | TimerPage
+    | NotFoundPage
 
 
 urlToPage url =
@@ -43,7 +44,7 @@ urlToPage url =
             TimerPage
 
         _ ->
-            CounterPage
+            NotFoundPage
 
 
 type alias Model =
@@ -54,10 +55,10 @@ init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init () url key =
     let
         ( model1, cmd1 ) =
-            Counter.init () |> Tuple.mapSecond (\cmd -> cmd |> Cmd.map CounterMsg)
+            Counter.init () |> Tuple.mapSecond (Cmd.map CounterMsg)
 
         ( model2, cmd2 ) =
-            Timer.init () |> Tuple.mapSecond (\cmd -> cmd |> Cmd.map TimerMsg)
+            Timer.init () |> Tuple.mapSecond (Cmd.map TimerMsg)
     in
         ( Model key (urlToPage url) model1 model2, Cmd.batch [ cmd1, cmd2 ] )
 
@@ -78,6 +79,9 @@ view model =
 
         TimerPage ->
             { title = "Timer", body = [ menu, (Timer.view model.timer) |> Html.map TimerMsg ] }
+
+        NotFoundPage ->
+            { title = "Not Found", body = [ menu, h1 [] [ text "Not Found" ] ] }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
