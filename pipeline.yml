@@ -1,0 +1,58 @@
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+
+resources:
+- name: src
+  type: git
+  source:
+    uri: https://github.com/backpaper0/elm-sandbox.git
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: ((slack.url))
+
+jobs:
+- name: build
+  plan:
+  - get: src
+    trigger: true
+  - task: build
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source: {repository: node, tag: latest}
+      inputs:
+        - name: src
+      run:
+        path: sh
+        args:
+          - -c
+          - |-
+            set -eux
+            cd src/sandbox
+            npm install elm elm-test
+            export PATH=`pwd`/node_modules/.bin:$PATH
+            elm make --output=/dev/null src/*.elm
+            elm-test tests
+    on_success:
+      put: slack-alert
+      params:
+        icon_emoji: ":elm:"
+        channel: "#ci"
+        username: "elm-sandbox"
+        text: |-
+              BUILD SUCCESS :sparkles:
+              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    on_failure:
+      put: slack-alert
+      params:
+        icon_emoji: ":elm:"
+        channel: "#ci"
+        username: "elm-sandbox"
+        text: |-
+              BUILD FAILURE :fearful:
+              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
