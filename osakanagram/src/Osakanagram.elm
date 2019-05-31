@@ -8,7 +8,35 @@ import Html.Events exposing (..)
 import Http
 
 
+type alias Photo =
+    { title : String, image : String, fav : Int }
+
+
+type alias Model =
+    List Photo
+
+
+type Msg
+    = Noop
+
+
 main =
+    Browser.element { init = init, view = view, update = update, subscriptions = subscriptions }
+
+
+init : () -> ( Model, Cmd Msg )
+init () =
+    let
+        model =
+            [ { title = "肉重", image = "http://localhost:8080/images/54277395_270952053826359_6864398686538064173_n.jpg", fav = 1 }
+            , { title = "カレー", image = "http://localhost:8080/images/51449439_382792795837276_3157664589089934568_n.jpg", fav = 0 }
+            ]
+    in
+        ( model, Cmd.none )
+
+
+view : Model -> Html Msg
+view model =
     div []
         [ header
             [ style "position" "fixed"
@@ -33,12 +61,12 @@ main =
             [ style "width" "500px"
             , style "margin" "65px auto"
             ]
-            [ photoView { title = "肉重", image = "http://localhost:8080/images/54277395_270952053826359_6864398686538064173_n.jpg", fav = 1 }
-            , photoView { title = "カレー", image = "http://localhost:8080/images/51449439_382792795837276_3157664589089934568_n.jpg", fav = 0 }
-            ]
+          <|
+            List.map photoView model
         ]
 
 
+photoView : Photo -> Html Msg
 photoView { title, image, fav } =
     div
         [ style "border" "1px solid silver"
@@ -67,3 +95,13 @@ photoView { title, image, fav } =
             , span [] [ text "いいね！", span [] [ text <| String.fromInt fav ], text "件" ]
             ]
         ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions =
+    always Sub.none
