@@ -17,7 +17,7 @@ type alias Model =
 
 
 type Msg
-    = Noop
+    = ClickStar Int
 
 
 main =
@@ -62,12 +62,12 @@ view model =
             , style "margin" "65px auto"
             ]
           <|
-            List.map photoView model
+            List.indexedMap photoView model
         ]
 
 
-photoView : Photo -> Html Msg
-photoView { title, image, fav } =
+photoView : Int -> Photo -> Html Msg
+photoView index { title, image, fav } =
     div
         [ style "border" "1px solid silver"
         , style "margin" "25px 0"
@@ -85,6 +85,7 @@ photoView { title, image, fav } =
                         "gray"
                     else
                         "PaleVioletRed"
+                , onClick <| ClickStar index
                 ]
                 [ text <|
                     if fav == 0 then
@@ -99,7 +100,19 @@ photoView { title, image, fav } =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        ClickStar index ->
+            let
+                favStar i photo =
+                    if i == index then
+                        { photo | fav = photo.fav + 1 }
+                    else
+                        photo
+
+                newModel =
+                    List.indexedMap favStar model
+            in
+                ( newModel, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
